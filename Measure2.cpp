@@ -65,9 +65,31 @@ void core1_lcd()
             0b00000,
             0b00000,
             0b00000,
-            0b00000};    
+            0b00000};        
+            
+    unsigned char inch[8] = {
+            0b01010,
+            0b10100,
+            0b10100,
+            0b10100,
+            0b00000,
+            0b00000,
+            0b00000,
+            0b00000};  
+
+    unsigned char divider[8] = {
+            0b01110,
+            0b01110,
+            0b01110,
+            0b01110,
+            0b01110,
+            0b01110,
+            0b01110,
+            0b01110};              
 
     lcdCharDef(lcd, 1, temp);
+    lcdCharDef(lcd, 2, inch);
+    lcdCharDef(lcd, 3, divider);
 
     float distance = 0.0, 
            temp_C = 0.0,
@@ -95,18 +117,24 @@ void core1_lcd()
         // Row 1
         lcdClear(lcd);
         lcdPosition(lcd,0,0);     
-        lcdPrintf(lcd ,"%2.1fcm", distance); 
-        lcdPosition(lcd,8,0);    
-        lcdPrintf(lcd ,"%2.1f",  temp_C);
-        lcdPosition(lcd, 13, 0);
-        lcdPutchar(lcd, 1);
+        lcdPrintf(lcd ,"%-2.1fcm", distance); 
+        lcdPosition(lcd,7,0);         
+        lcdPutchar(lcd, 3);  
+        lcdPosition(lcd,10,0);   
+        lcdPrintf(lcd ,"%-2.1f",  temp_C);
         lcdPosition(lcd, 14, 0);
+        lcdPutchar(lcd, 1);
+        lcdPosition(lcd, 15, 0);
         lcdPutchar(lcd, 'C');
 
         //  Row 2
         lcdPosition(lcd,0,1);  
-        lcdPrintf(lcd ,"------>");
-        lcdPosition(lcd,8,1);  
+        lcdPrintf(lcd ,"%-2.2f", distance / 2.54);
+        lcdPosition(lcd,5,1);         
+        lcdPutchar(lcd, 2); 
+        lcdPosition(lcd,7,1);         
+        lcdPutchar(lcd, 3); 
+        lcdPosition(lcd,9,1);  
         lcdPrintf(lcd ,"Hum %-d%%", (int16_t)dht_hum);
 
         sleep_ms(500);
@@ -115,19 +143,16 @@ void core1_lcd()
 }
 
 int main() {    
-    // Wait for a bit for things to khappen
-    sleep_ms(1000);
     stdio_init_all();
 
     // init HR-sc04
-    double distance = 0.0;
-
     gpio_init(TRIG_PIN);
     gpio_set_dir(TRIG_PIN, GPIO_OUT);
     gpio_init(ECHO_PIN);
     gpio_set_dir(ECHO_PIN, GPIO_IN);
+    double distance = 0.0;
 
-    // lcd data will be handled by core1.
+    // lcd handled by core1.
     multicore_launch_core1(core1_lcd);    
 
     // init dht11
@@ -136,7 +161,7 @@ int main() {
     dht_reading result;
     
     // Wait for a bit for things to khappen
-    sleep_ms(1000);
+    sleep_ms(100);
 
     double temp_C;
 
@@ -160,11 +185,11 @@ int main() {
         if(multicore_fifo_wready())
             multicore_fifo_push_blocking(t);
 
-        temp_C = result.temp_whole + result.temp_frac * 0.1;
-        distance = t * sqrt(temp_C + 273.15) * 0.0010025;
+        // temp_C = result.temp_whole + result.temp_frac * 0.1;
+        // distance = t * sqrt(temp_C + 273.15) * 0.0010025;
 
-        printf("%2.1fcm %2.1fC\n", distance,  temp_C);  
-        printf("MCU C Hum %d%\n\n", result.humidity);
+        // printf("%2.1fcm %2.1fC\n", distance,  temp_C);  
+        // printf("MCU C Hum %d%\n\n", result.humidity);
  
         sleep_ms(500);
     }

@@ -21,6 +21,12 @@
  *
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with wiringPi.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * *********************************************************************
+ * 	 2022/03/03 :
+ * 		Modified from Gordon Henderson's wiring Pi LCD code (see above).
+ * 		Ported for usage on RP2040.
+ * 	
  ***********************************************************************
  */
 
