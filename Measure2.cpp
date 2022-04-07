@@ -142,7 +142,9 @@ void core1_lcd()
     }
 }
 
-int main() {    
+int main() {        
+    // Wait for a bit for things to khappen
+    sleep_ms(1000);
     stdio_init_all();
 
     // init HR-sc04
@@ -161,7 +163,7 @@ int main() {
     dht_reading result;
     
     // Wait for a bit for things to khappen
-    sleep_ms(100);
+    sleep_ms(1000);
 
     double temp_C;
 
